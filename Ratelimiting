@@ -1,0 +1,25 @@
+metadata:
+    language: v2-beta
+    name: "Rate Limiting Header Check"
+    description: "Verifies the presence and configuration of rate limiting headers in HTTP responses."
+    author: "Madhuri"
+
+given response then
+    if !{response.headers}.includes("X-Ratelimit-Limit") || !{response.headers}.includes("X-Ratelimit-Remaining") then
+        report issue and continue:
+            severity: medium
+            confidence: high
+            detail: "Missing Rate Limiting Headers: The response lacks one or both rate limiting headers ('X-Ratelimit-Limit' or 'X-Ratelimit-Remaining')."
+            remediation: "Ensure that rate limiting headers are included in all responses to prevent potential abuse of API endpoints."
+    else
+        let rateLimit = parseInt({response.headers}["X-Ratelimit-Limit"])
+        let remaining = parseInt({response.headers}["X-Ratelimit-Remaining"])
+        
+        if rateLimit > 1000 then
+            report issue and continue:
+                severity: medium
+                confidence: tentative
+                detail: "High Rate Limit: The rate limit is unusually high with 'X-Ratelimit-Limit' set to {rateLimit}. Consider reducing this limit to mitigate abuse risks."
+                remediation: "Lower the rate limit to a more secure threshold to help control excessive requests and reduce abuse potential."
+        end if
+    end if

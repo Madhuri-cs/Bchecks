@@ -1,0 +1,16 @@
+metadata:
+    language: v2-beta
+    name: "Dangerous PUT Method Allowed "
+    description: "Send HTTP PUT method to site to check what methods are available via the response"
+    author: "madhuri"
+
+given path then
+    send request called check:
+        method: "PUT"
+
+    if ({latest.response.status_code} matches "2[0-9][0-9]") or ({latest.response.status_code} matches "3[0-9][0-9]") then
+        report issue:
+            severity: high
+            confidence: tentative
+            detail: "The PUT method is allowed"
+    end if

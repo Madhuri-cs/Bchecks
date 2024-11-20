@@ -1,0 +1,14 @@
+metadata:
+    language: v2-beta
+    name: "Banner Grabbing"
+    description: "Checks for server details in all responses"
+    author: "madhuri"
+
+given response then
+if {latest.response} matches "([Xx](-|_)|)[Ss]erver:[^\n]+" then
+  report issue:
+    severity: info
+    confidence: certain
+    detail: "Disclosed server details"
+    remediation: "Do not reveal sever details in headers or response"
+end if

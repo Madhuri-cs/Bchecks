@@ -1,0 +1,17 @@
+metadata:
+    language: v2-beta
+    name: "HTTP Methods Available"
+    description: "Send HTTP OPTIONS method to site to check what methods are available via the response"
+    author: "madhuri"
+
+given path then
+    send request called check:
+        method: "OPTIONS"
+
+    if {check.response.headers} matches "[Aa]ccess-[Cc]ontrol-[Aa]llow-[Mm]ethods:[^\n]+" then
+        report issue:
+            severity: info
+            confidence: tentative
+            detail: `Check the 'Allow:' Header value(s)\n\n{check.response.headers}`
+            
+    end if

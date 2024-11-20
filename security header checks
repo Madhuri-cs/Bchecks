@@ -1,0 +1,33 @@
+metadata:
+    language: v2-beta
+    name: "security header checks"
+    description: "check if the response headers contain the necessary security headers"
+    author: "madhuri"
+
+# Strict-Transport-Security header check
+given response then
+    if not ({latest.response.headers} matches ".*(?i)Strict-Transport-Security:.*" or {latest.response.headers} matches ".*(?i)X-Frame-Options:.*") then
+        report issue and continue:
+            severity: medium
+            confidence: certain
+            detail: "Strict-Transport-Security (HSTS) header is missing"
+            remediation: "Ensure HSTS is enforced by adding the Strict-Transport-Security header."
+
+     
+     if not ({latest.response.headers} matches ".*(?i)X-Frame-Options:.*") then
+        report issue and continue:
+            severity: low
+            confidence: certain
+            detail: "X-Frame-Options header is missing"
+            remediation: "Add the X-Frame-Options header to mitigate clickjacking attacks."
+
+     if not ({latest.response.headers} matches ".*(?i)X-XSS-Protection:.*") then
+        report issue and continue:
+            severity: low
+            confidence: certain
+            detail: "X-XSS-Protection header is missing"
+            remediation: "Add the X-XSS-Protection header to mitigate XSS attacks."
+
+      end if
+    end if
+ end if
